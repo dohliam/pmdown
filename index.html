@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+    <title>Markdown to PmWiki Converter</title>
+    <link rel="shortcut icon" href="favicon.ico?v=2">
+    <link rel="stylesheet" type="text/css" href="https://dohliam.github.io/dropin-minimal-css/min/skeleton-framework.min.css"/>
+    <meta name="viewport" content="width=device-width">
+    <script src="js/convert.js" type="text/javascript"></script>
+    <script src="js/patterns.js" type="text/javascript"></script>
+    <script src="js/strings.js" type="text/javascript"></script>
+    <style>
+      #lang_selector {
+        float: right;
+      }
+    </style>
+  </head>
+  <body onload="window.text_input.focus()">
+    <header>
+      <select name="lang_selector" id="lang_selector" accesskey="l" onchange="translate_string(this.value)">
+        <option value="en">English</option>
+        <option value="zhs">中文（简体）</option>
+        <option value="zht">中文（繁體）</option>
+      </select>
+    </header>
+
+    <h1 class="tr-string" data-tr="title">Markdown to PmWiki Converter</h1>
+    <p class="tr-string" data-tr="intro">This is a tool for converting Markdown text into PmWiki format.</p>
+
+    <select name="option" id="option" accesskey="x">
+      <option class="tr-string" data-tr="m2p" value="option1">Markdown to PmWiki</option>
+      <option class="tr-string" data-tr="p2m" value="option2">PmWiki to Markdown</option>
+    </select>
+
+    <br><textarea id="text_input" class="tr-string" data-tr="text_input" cols="50" rows="10" accesskey="i" placeholder="Input" oninput="convert_button()"></textarea>
+    <br><button class="tr-string" data-tr="convert_btn" type="button" accesskey="c" onclick="convert_button()">Convert</button> <button class="tr-string" data-tr="demo_btn" type="button" accesskey="d" onclick="demoText()">Demo text</button>
+    <br>
+    <textarea id="text_output" class="tr-string" data-tr="text_output" accesskey="o" cols="50" rows="10" placeholder="Output"></textarea>
+
+    <footer><strong class="tr-string" data-tr="view">View this project on <a href="https://github.com/dohliam/pmwiki-md-converter">Github</a>.</strong></footer>
+  </body>
+</html>
