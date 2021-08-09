@@ -15,6 +15,8 @@ function replacementsOpt1(text) {
   .replace(/^(\s+)\d+\. /gm, function (match, p1) {
     return repeatString("#", p1.length / 2 + 1);
   })
+  .replace(/\[(.*?)\]::/g, "(:comment $1:)")
+  .replace(/\[\/\/\]: # \((.*?)\)/g, "(:comment $1:)")
 
   return output;
 }
@@ -35,7 +37,8 @@ function replacementsOpt2(text) {
     })
     .replace(/'''''(.*?)'''''/g, "**_$1_**")
     .replace(/'''(.*?)'''/g, "**$1**")
-    .replace(/''(.*?)''/g, "_$1_");
+    .replace(/''(.*?)''/g, "_$1_")
+    .replace(/\(:comment (.*?):\)/g, "[$1]::")
 
   return output;
 }
