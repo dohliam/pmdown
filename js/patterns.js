@@ -1,6 +1,7 @@
 function replacementsOpt1(text) {
   output = text
-  .replace(/\s\*\*([^\*]+)\*\*/g, " '''$1'''")
+  .replace(/(^|\s)\*\*_([^\*]+)_\*\*/g, "$1'''''$2'''''")
+  .replace(/(^|\s)\*\*([^\*]+)\*\*/g, "$1'''$2'''")
   .replace(/^\* /gm, "*")
   .replace(/\[(.*?)\]\((.*?)\)/gm, "[[$2|$1]]")
   .replace(/^(#+)\s+(.*)\n+/gm, function (match, p1, p2) {
@@ -32,6 +33,7 @@ function replacementsOpt2(text) {
     .replace(/^(\!+)(.*)\n+/gm, function(match, p1, p2) {
       return repeatString("#", p1.length) + " " + p2 + "\n\n";
     })
+    .replace(/'''''(.*?)'''''/g, "**_$1_**")
     .replace(/'''(.*?)'''/g, "**$1**")
     .replace(/''(.*?)''/g, "_$1_");
 
