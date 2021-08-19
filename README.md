@@ -1,10 +1,10 @@
-# Markdown to PmWiki Converter
+# PmDown - PmWiki to Markdown Converter
 
-This is a tool for converting Markdown text into [PmWiki](https://www.pmwiki.org/) format, and vice versa. A JavaScript version (for online or offline use in a browser) as well as a Ruby version (for use on the command-line) are available.
+This is a tool for converting [PmWiki](https://www.pmwiki.org/) to Markdown format, and vice versa. A JavaScript version (for online or offline use in a browser) as well as a Ruby version (for use on the command-line) are available.
 
 ## Features
 
-* Supports converting Markdown to PmWiki and PmWiki to Markdown
+* Supports converting PmWiki to Markdown and Markdown to PmWiki
 * Multilanguage localization support: English, Chinese (Traditional), and Chinese (Simplified)
   * Add other languages easily by translating the strings in `strings.js`
 
