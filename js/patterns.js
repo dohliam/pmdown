@@ -16,7 +16,7 @@ function replacementsOpt1(text) {
     return repeatString("#", p1.length / 2 + 1);
   })
   .replace(/\[(.*?)\]::/g, "(:comment $1:)")
-  .replace(/\[\/\/\]: # \((.*?)\)/g, "(:comment $1:)")
+  .replace(/\[\/\/\]: # \((.*?)\)/g, "(:comment $1:)");
 
   return output;
 }
@@ -38,7 +38,7 @@ function replacementsOpt2(text) {
     .replace(/'''''(.*?)'''''/g, "**_$1_**")
     .replace(/'''(.*?)'''/g, "**$1**")
     .replace(/''(.*?)''/g, "_$1_")
-    .replace(/\(:comment (.*?):\)/g, "[$1]::")
+    .replace(/\(:comment (.*?):\)/g, "[$1]::");
 
   return output;
 }
@@ -54,7 +54,7 @@ function repeatString(string, num) {
 function demoText() {
   inputBox = window.text_input;
   options = window.option.value;
-  text = "# Heading 1\n\nThis is some text. **Bold text**. _Italic text_.\n\n[This is a link](https://example.com)\n\n## Heading 2\n\n* First point\n* Second point\n  * Indented point 1\n  * Indented point 2\n* Third point\n  * Indent level 1\n    * Indent level 2\n      * Indent level 3\n\n1. First list item\n2. Second list item\n  1. Indented list item 1\n  2. Indented list item 2\n3. Third list item\n  1. Indented list level 1\n    1. Indented list level 2\n      1. Indented list level 3\n\n## Heading 3\n\nEnd of demo.\n"
+  text = "# Heading 1\n\nThis is some text. **Bold text**. _Italic text_.\n\n[This is a link](https://example.com)\n\n## Heading 2\n\n* First point\n* Second point\n  * Indented point 1\n  * Indented point 2\n* Third point\n  * Indent level 1\n    * Indent level 2\n      * Indent level 3\n\n1. First list item\n2. Second list item\n  1. Indented list item 1\n  2. Indented list item 2\n3. Third list item\n  1. Indented list level 1\n    1. Indented list level 2\n      1. Indented list level 3\n\n## Heading 3\n\nEnd of demo.\n";
 
   if (options == "option2") {
     text = replacementsOpt1(text);
