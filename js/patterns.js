@@ -31,7 +31,7 @@ function replacementsOpt2(text) {
       return repeatString("  ", match.length / 2) + "* ";
     })
     .replace(/^\*/gm, "* ")
-    .replace(/\[\[(.*?)\|(.*?)\]\]/g, "[$2]($1)")
+    .replace(/\[\[(https*:\/\/.*?)\|(.*?)\]\]/g, "[$2]($1)")
     .replace(/^(\!+)(.*)\n+/gm, function(match, p1, p2) {
       return repeatString("#", p1.length) + " " + p2 + "\n\n";
     })
