@@ -6,7 +6,7 @@ function! PMWiki_Extract_Text ()
     % global! /^text=/ delete
     1 substitute /^text=//
     1 substitute /%0a/\r/ge
-endfunction # PMWiki_Extract_Text
+endfunction PMWiki_Extract_Text
 
 ""
 "  Add hugo front matter
@@ -17,21 +17,33 @@ function! PMWiki_Add_Front_Matter ()
 
     1 insert
 ---
-title       : "(:title:)"
+title	    : "(:title:)"
 description : "(:title:)"
 summary     : "(:title:)."
 showSummary : true
-date        : (:date:)
-draft       : true
-type        : "page"
+date	    : (:date:)
+draft	    : true
+type	    : "page"
 categories  : []
-tags        : []
+tags	    : []
 ---
 .
     2,4 substitute /(:title:)/\= l:Title_Text /e
-    6   substitute /(:date:)/\= strftime("%Y-%m-%dT%T%z",expand("%")->getftime()) /e
-    12  delete
-endfunction # PMWiki_Add_Front_Matter
+    6	substitute /(:date:)/\= strftime("%Y-%m-%dT%T%z",expand("%")->getftime()) /e
+    12	delete
+
+
+    $ append
+<!-- vim: set wrap tabstop=8 shiftwidth=4 softtabstop=4 noexpandtab : -->
+<!-- vim: set textwidth=79 filetype=markdown foldmethod=marker spell : -->
+<!-- vim: set spell spelllang=en_gb : -->
+.
+
+    set wrap tabstop=8 shiftwidth=4 softtabstop=4 expandtab
+    set textwidth=79 filetype=markdown foldmethod=marker spell
+    set spell spelllang=en_gb
+
+endfunction PMWiki_Add_Front_Matter
 
 function! PMWiki_To_Markdown ()
     " Convert odered list
@@ -44,7 +56,7 @@ function! PMWiki_To_Markdown ()
 
     " Convert definition list
     "
-    % substitute /\v^:(.{-}):(.*)/\= "\n**" . submatch(1)->trim() . "**\n" . ": " . submatch(2)->trim() /e
+    % substitute /\v^[:;](.{-}):(.*)/\= "\n**" . submatch(1)->trim() . "**\n" . ": " . submatch(2)->trim() /e
     % substitute /\v^-\>(.*)/\= ": " . submatch(1)->trim() /e
 
     " Convert header
@@ -61,27 +73,68 @@ function! PMWiki_To_Markdown ()
 
     " Convert bold italic
     "
-    % substitute /\v'''''(.*?)'''''/_**\\1**_"/e
+    % substitute /\v'{5,5}(.{-})'{5,5}/_**\1**_/e
 
     " Convert bold
     "
-    % substitute /\v'''(.*?)'''/**\\1**"/e
+    % substitute /\v'{3,3}(.{-})'{3,3}/**\1**/e
 
     " Convert italic
     "
-    % substitute /\v''(.*?)''/_\\1_"/e
+    % substitute /\v'{2,2}(.{-})'{2,2}/_\1_/e
 
     " Convert code blocks
     "
     % substitute /\V\^[@/```text/e
     % substitute /\V\^@]/```/e
 
-    " Convert table
+    " Convert complex table
     "
-    global /^||/ substitute /||!\?/|/g
-
 endfunction PMWiki_To_Markdown
 
-" vim: set textwidth=78 nowrap tabstop=8 shiftwidth=4 softtabstop=4 expandtab :
+function! PMWiki_Table_To_Markdown ()
+    let s:line=getline('.')
+
+    /{|/,/|}/ substitute /||!\?/|/ge
+    call setline('.', s:line)
+
+    "  Replace header marker (denoted by a '!') with column marker
+    "
+    /{|/,/|}/ substitute /^!\s.\{-}\s|/|/e
+    call setline('.', s:line)
+
+    "  Replace column marker (dentoted by a '|') with column marker
+    "
+    /{|/,/|}/ substitute /||/|/ge
+    call setline('.', s:line)
+
+    "  Delete row marker
+    "
+    /{|/,/|}/ global  /^|-/ delete
+    call setline('.', s:line)
+
+    " Convert caption 
+    "
+    /{|/,/|}/ substitute /^|+\(.*\)/**\1**/e
+    call setline('.', s:line)
+
+    "  Add missing with column marker at end of line
+    "
+    /{|/,/|}/ substitute /[^|]$/\0 |/e
+    call setline('.', s:line)
+
+endfunction PMWiki_Table_To_Markdown
+
+command PMWikiExtractText	:call PMWiki_Extract_Text()
+command PMWikiAddFrontMatter	:call PMWiki_Add_Front_Matter()
+command PMWikiToMarkdown	:call PMWiki_To_Markdown()
+command PMWikiTableToMarkdown	:call PMWiki_Table_To_Markdown()
+
+execute "47menu Plugin.Wiki.PMWiki\\ Extract\\ Text<Tab>"	    . escape(g:mapleader . "pe" , '\') . " :call PMWiki_Extract_Text()<CR>"
+execute "47menu Plugin.Wiki.PMWiki\\ Add\\ Front\\ Matter<Tab>"	    . escape(g:mapleader . "pa" , '\') . " :call PMWiki_Add_Front_Matter()<CR>"
+execute "47menu Plugin.Wiki.PMWiki\\ To\\ Markdown<Tab>"	    . escape(g:mapleader . "pm" , '\') . " :call PMWiki_To_Markdown()<CR>"
+execute "47menu Plugin.Wiki.PMWiki\\ Table\\ To\\ Markdown<Tab>"    . escape(g:mapleader . "pt" , '\') . " :call PMWiki_Table_To_Markdown()<CR>"
+
+" vim: set textwidth=78 nowrap tabstop=8 shiftwidth=4 softtabstop=4 noexpandtab :
 " vim: set filetype=vim fileencoding= fileformat=unix foldmethod=marker :
 " vim: set nospell spelllang=en_bg :
