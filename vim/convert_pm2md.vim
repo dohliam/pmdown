@@ -12,7 +12,7 @@ endfunction "PMWiki_Extract_Text
 "  Add hugo front matter
 "
 function! PMWiki_Add_Front_Matter ()
-    let l:Title_Line=line(1)
+    let l:Title_Line=getline(1)
     let l:Title_Text=Title_Line->substitute("^(:title ", "", "")->substitute(":)$", "", "")
 
     1 insert
@@ -73,8 +73,8 @@ function! PMWiki_To_Markdown ()
 
     " Convert small text
     "
-    % substitute !\v\[-(.{-})-\]!<small>\1</small>!e
-    % substitute !\v'-(.{-})-'!<small>\1</small>!e
+    % substitute !\v\[-(.{-})-\]!<small>\1</small>!ge
+    % substitute !\v'-(.{-})-'!<small>\1</small>!ge
 
     " Convert bold italic
     "
@@ -99,7 +99,9 @@ function! PMWiki_To_Markdown ()
 
     " Convert Picture links
     "
-    % substitute #^%25width=\(\d*\)px%25 .*/\(.*.png\) | \(.*\)#![\3](\2?width=\1 "\3")#ge
+    % substitute #^%25width=\(\d*\)px%25 .*/\(.*.png\|.*.jpg\) | \(.*\)#![\3](\2?width=\1 "\3")#ge
+    % substitute #^%25lframe%25 .*/\(.*.png\|.*.jpg\) | \(.*\)#![\2](\1?width=320 "\2")#ge
+    % substitute #^%25lframe width=\d*px%25 .*/\(.*.png\|.*.jpg\) | \(.*\)#![\2](\1?width=320 "\2")#ge
 endfunction "PMWiki_To_Markdown
 
 "   Relace a standart table which begins with {| and |}. Converts one table at
