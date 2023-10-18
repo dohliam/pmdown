@@ -1,17 +1,30 @@
+"-------------------------------------------------------------------------------
+"  Description: Convert PMWiki to Markdown
+"   Maintainer: Martin Krischik «krischik@users.sourceforge.net»
+"       Author: Martin Krischik «krischik@users.sourceforge.net»
+"    Copyright: Copyright © 2023 Martin Krischik
+" Name Of File: autoload/pm2md.vim
+"      Version: 1.0
+"	 Usage: copy to autoloa directory
+"      History: 18.10.2023 MK Initial Release
+"-------------------------------------------------------------------------------
 
 ""
-"  Extract text from PMWiki raw data file
+"  Extract text from PMWiki raw data file. Usefull if you use the PMWiki
+"  database file to start the conversion process. 
 "
-function! PMWiki_Extract_Text ()
+function! pm2md#Extract_Text ()
     % global! /^text=/ delete
     1 substitute /^text=//
     1 substitute /%0a/\r/ge
-endfunction "PMWiki_Extract_Text
+endfunction "pm2md#Extract_Text
 
 ""
-"  Add hugo front matter
+"  Add hugo front matter. Uses the first line as title, description and
+"  summary. Uses the file date as article date. Works best when called
+"  directly after pm2md#Extract_Text without saving in between.
 "
-function! PMWiki_Add_Front_Matter ()
+function! pm2md#Add_Front_Matter ()
     let l:Title_Line=getline(1)
     let l:Title_Text=Title_Line->substitute("^(:title ", "", "")->substitute(":)$", "", "")
 
@@ -42,9 +55,13 @@ tags	    : []
     set wrap tabstop=8 shiftwidth=4 softtabstop=4 expandtab
     set textwidth=79 filetype=markdown foldmethod=marker spell
     set spell spelllang=en_gb
-endfunction "PMWiki_Add_Front_Matter
+endfunction "pm2md#Add_Front_Matter
 
-function! PMWiki_To_Markdown ()
+""
+"   Converts most of PMWiki syntax to markdown. Currently only the three types
+"   of tables need to be concerted seperatly.
+"
+function! pm2md#Convert ()
     " Convert odered list
     "
     % substitute /\v^(#{1,})(.*)/\= repeat(" ", submatch(1)->strlen() - 1) . "1. " . submatch(2)->trim() /e
@@ -102,57 +119,60 @@ function! PMWiki_To_Markdown ()
     % substitute #^%25width=\(\d*\)px%25 .*/\(.*.png\|.*.jpg\) | \(.*\)#![\3](\2?width=\1 "\3")#ge
     % substitute #^%25lframe%25 .*/\(.*.png\|.*.jpg\) | \(.*\)#![\2](\1?width=320 "\2")#ge
     % substitute #^%25lframe width=\d*px%25 .*/\(.*.png\|.*.jpg\) | \(.*\)#![\2](\1?width=320 "\2")#ge
-endfunction "PMWiki_To_Markdown
+endfunction "pm2md#Convert
 
+""
 "   Relace a standart table which begins with {| and |}. Converts one table at
 "   a time to. Position cursort in the line above the {|.
 "
-function! PMWiki_Table_To_Markdown ()
+function! pm2md#Convert_Table ()
     /{|/ mark s
     /|}/ mark e
 
     "	Replace single line column marker
     "
-    's,'e  substitute /||!\?/|/ge
+    's,'e substitute /||!\?/|/ge
 
     "  Replace header marker (denoted by a '!') with column marker
     "
-    's,'e  substitute /^!\s.\{-}\s|/|/e
+    's,'e substitute /^!\s.\{-}\s|/|/e
 
     "  Replace column marker (dentoted by a '|') with column marker
     "
-    's,'e  substitute /||/|/ge
+    's,'e substitute /||/|/ge
 
     "  Delete row marker
     "
-    's,'e  global  /^|-/ delete
+    's,'e global /^|-/ delete
 
     " Convert caption 
     "
-    's,'e  substitute /^|+\(.*\)/**\1**/e
+    's,'e substitute /^|+\(.*\)/**\1**/e
 
     "  Add missing with column marker at end of line
     "
-    's,'e  substitute /[^|]$/\0 |/e
-endfunction "PMWiki_Table_To_Markdown
+    's,'e substitute /[^|]$/\0 |/e
+endfunction "pm2md#Convert_Table
 
+""
 "   Relace a simple tables where each row is on one column. Converts one table
 "   at a time to. Use line select to select the table from begin to end.
 "
-function! PMWiki_Simple_Table_To_Markdown () range
+function! pm2md#Convert_Simple_Table () range
     "	Replace single line column marker
     "
     execute a:firstline . "," . a:lastline " substitute /||!\\?/|/ge"
     "  Add missing with column marker at end of line
     "
     execute a:firstline . "," . a:lastline " substitute /[^|]$/\\0 |/e" 
-endfunction "PMWiki_Simple_Table_To_Markdown
+endfunction "pm2md#Convert_Simple_Table
 
+""
 "   Relace a complex table using the (:table:) markup. Converts one table at a
 "   time to. Place the cursor in the line above (:table:). Needs the
 "   {{< rawhtml >}} shortcode.
 "
-function! PMWiki_Complex_Table_To_Raw_HTML () 
+function! pm2md#Convert_Complex_Table () 
     /^(:table[: ]/ mark s
     /^(:tableend/  mark e
 
@@ -177,21 +197,7 @@ function! PMWiki_Complex_Table_To_Raw_HTML ()
     "	Replace table end.
     "
     's,'e substitute !(:tableend:)!</tr>\r</table>\r{{< /rawhtml >}}!ge
-endfunction "PMWiki_Complex_Table_To_Raw_HTML
-
-command		PMWikiExtractText	    :call PMWiki_Extract_Text()
-command		PMWikiAddFrontMatter	    :call PMWiki_Add_Front_Matter()
-command		PMWikiToMarkdown	    :call PMWiki_To_Markdown()
-command		PMWikiTableToMarkdown	    :call PMWiki_Table_To_Markdown()
-command -range	PMWikiSimpleTableToMarkdown :<line1>,<line2> call PMWiki_Simple_Table_To_Markdown()
-command 	PMWikiComplexTableToRawHTML :call PMWiki_Complex_Table_To_Raw_HTML()
-
-execute "47menu Plugin.Wiki.PMWiki\\ Extract\\ Text<Tab>"			. escape(g:mapleader . "pe" , '\') . " :call PMWiki_Extract_Text()<CR>"
-execute "47menu Plugin.Wiki.PMWiki\\ Add\\ Front\\ Matter<Tab>"			. escape(g:mapleader . "pa" , '\') . " :call PMWiki_Add_Front_Matter()<CR>"
-execute "47menu Plugin.Wiki.PMWiki\\ To\\ Markdown<Tab>"			. escape(g:mapleader . "pm" , '\') . " :call PMWiki_To_Markdown()<CR>"
-execute "47menu Plugin.Wiki.PMWiki\\ Table\\ To\\ Markdown<Tab>"		. escape(g:mapleader . "pt" , '\') . " :call PMWiki_Table_To_Markdown()<CR>"
-execute "47menu Plugin.Wiki.PMWiki\\ Simple\\ Table\\ To\\ Markdown<Tab>"	. escape(g:mapleader . "pt" , '\') . " :'<,'>call PMWiki_Simple_Table_To_Markdown()<CR>"
-execute "47menu Plugin.Wiki.PMWiki\\ Complex\\ Table\\ To\\ Raw\\ HTML<Tab>"	. escape(g:mapleader . "pt" , '\') . " :'<,'>call PMWiki_Complex_Table_To_Raw_HTML()<CR>"
+endfunction "pm2md#Convert_Complex_Table
 
 " vim: set textwidth=78 nowrap tabstop=8 shiftwidth=4 softtabstop=4 noexpandtab :
 " vim: set filetype=vim fileencoding= fileformat=unix foldmethod=marker :
