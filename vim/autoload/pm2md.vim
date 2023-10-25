@@ -93,6 +93,11 @@ function! pm2md#Convert ()
     % substitute !\v\[-(.{-})-\]!<small>\1</small>!ge
     % substitute !\v'-(.{-})-'!<small>\1</small>!ge
 
+    " Convert super and subscript
+    "'^
+    % substitute !\v'\^(.{-})\^'!<sup>\1</sup>!ge
+    % substitute !\v'_(.{-})_'!<sub>\1</sub>!ge
+
     " Convert bold italic
     "
     % substitute /\v'{5,5}(.{-})'{5,5}/_**\1**_/ge
