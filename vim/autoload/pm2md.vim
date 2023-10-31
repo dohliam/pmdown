@@ -51,10 +51,12 @@ function pm2md#Fix_Dates (Markdown, PMWiki)
 
     execute "edit" a:Markdown
     1
-    /\Vlastmod\s\*:/ substitute /\v:.*$/\= ': "' . system("gdate -d @" . modify_time . " --rfc-3339=seconds")[:-2] . '"'/
+    /\Vlastmod\s\*:/
+    . substitute /\v:.*$/\= ': "' . system("gdate -d @" . modify_time . " --rfc-3339=seconds")[:-2] . '"'/
 
     1
-    /\Vdate\s\*:/ substitute /\v:.*$/\= ': "' . system("gdate -d @" . create_time . " --rfc-3339=seconds")[:-2] . '"'/
+    /\Vdate\s\*:/
+    . substitute /\v:.*$/\= ': "' . system("gdate -d @" . create_time . " --rfc-3339=seconds")[:-2] . '"'/
 
 endfunction "pm2md#Fix_Dates
 
