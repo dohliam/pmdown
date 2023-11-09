@@ -4,9 +4,11 @@
 "       Author: Martin Krischik «krischik@users.sourceforge.net»
 "    Copyright: Copyright © 2023 Martin Krischik
 " Name Of File: autoload/pm2md.vim
-"      Version: 1.0
+"      Version: 1.1
 "	 Usage: copy to autoloa directory
 "      History: 18.10.2023 MK Initial Release
+"      History: 29.10.2023 MK Update Extract_Text to get initial and update
+"			      timestamps
 "-------------------------------------------------------------------------------
 
 ""
@@ -14,10 +16,49 @@
 "  database file to start the conversion process. 
 "
 function! pm2md#Extract_Text ()
+    1
+    /\v^ctime=/
+    let l:create_time = line(".")->getline()->substitute("^.\\{-}=", "", "")
+
+    1
+    /\v^time=/
+    let l:modify_time = line(".")->getline()->substitute("^.\\{-}=", "", "")
+
     % global! /^text=/ delete
     1 substitute /^text=//
     1 substitute /%0a/\r/ge
+
+    call append (1, 'date	    : "' . system ("gdate -d @" . modify_time . " --rfc-3339=seconds")[:-2] . '"')
+    call append (1, 'lastmod	    : "' . system ("gdate -d @" . create_time . " --rfc-3339=seconds")[:-2] . '"')
 endfunction "pm2md#Extract_Text
+
+""
+"   Extract date and lastmod from PMWiki file and correct the dates of
+"   converted markdown file. Normaly pm2md#Extract_Text should correctly
+"   extract the dates. Die function only needs to be used if this fails for
+"   whatever reason
+"
+function pm2md#Fix_Dates (Markdown, PMWiki)
+    execute "edit" a:PMWiki
+
+    1
+    /\v^ctime=/
+    let l:create_time = line(".")->getline()->substitute("^.\\{-}=", "", "")
+
+    1
+    /\v^time=/
+    let l:modify_time = line(".")->getline()->substitute("^.\\{-}=", "", "")
+
+    execute "edit" a:Markdown
+    1
+    /\Vlastmod\s\*:/
+    . substitute /\v:.*$/\= ': "' . system("gdate -d @" . modify_time . " --rfc-3339=seconds")[:-2] . '"'/
+
+    1
+    /\Vdate\s\*:/
+    . substitute /\v:.*$/\= ': "' . system("gdate -d @" . create_time . " --rfc-3339=seconds")[:-2] . '"'/
+
+endfunction "pm2md#Fix_Dates
 
 ""
 "  Add hugo front matter. Uses the first line as title, description and
@@ -44,8 +85,7 @@ tags	    : []
     2,4 substitute /(:title:)/\= l:Title_Text /e
     6	substitute /(:date:)/\= strftime("%Y-%m-%dT%T%z",expand("%")->getftime()) /e
     12	delete
-
-
+ 
     $ append
 <!-- vim: set wrap tabstop=8 shiftwidth=4 softtabstop=4 noexpandtab : -->
 <!-- vim: set textwidth=79 filetype=markdown foldmethod=marker spell : -->
