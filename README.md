@@ -1,6 +1,8 @@
 # PmDown - PmWiki to Markdown Converter
 
-This is a tool for converting [PmWiki](https://www.pmwiki.org/) to Markdown format, and vice versa. A JavaScript version (for online or offline use in a browser) as well as a Ruby version (for use on the command-line) are available.
+![](vim/Pictures/Project_logo.png)
+
+This is a tool for converting [PmWiki](https://www.pmwiki.org/) to Markdown format, and vice versa. A JavaScript version (for online or offline use in a browser), a Ruby version (for use on the command-line) and a VIM version (with more options) are available.
 
 ## Features
 
@@ -26,3 +28,4 @@ Other simple text converters:
 ## License
 
 MIT.
+
